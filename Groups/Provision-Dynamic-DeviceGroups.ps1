@@ -43,5 +43,9 @@ $AllPersonallyOwnedAndroidDevices = (AzureADPreview\New-AzureADMSGroup -Descript
 AzureADPreview\Set-AzureADMSGroup -id $AllPersonallyOwnedAndroidDevices -GroupTypes "DynamicMembership" -MembershipRule '(device.deviceOSType -eq "AndroidForWork") and (device.managementType -eq "MDM")' -MembershipRuleProcessingState "On" -Verbose
 
 $FullyManagedAndroid = "All Fully Managed Android Enterprise Devices"
-$AllFullyManagedAndroidDevices = (AzureADPreview\New-AzureADMSGroup -Description $FullyManagedAndroid -DisplayName $FullyManagedAndroid-mailEnabled 0 -mailnickname 0 -securityEnabled 1 -Verbose).id
+$AllFullyManagedAndroidDevices = (AzureADPreview\New-AzureADMSGroup -Description $FullyManagedAndroid -DisplayName $FullyManagedAndroid -mailEnabled 0 -mailnickname 0 -securityEnabled 1 -Verbose).id
 AzureADPreview\Set-AzureADMSGroup -id $AllFullyManagedAndroidDevices -GroupTypes "DynamicMembership" -MembershipRule '(device.deviceOSType -eq "AndroidEnterprise") -and (device.enrollmentProfileName -eq null)' -MembershipRuleProcessingState "On" -Verbose
+
+$DedicatedDevices = "Dedicated Devices Android Enterprise"
+$AllDedicatedDevices = (AzureADPreview\New-AzureADMSGroup -Description $DedicatedDevices -DisplayName $DedicatedDevices -mailEnabled 0 -mailnickname 0 -securityEnabled 1 -Verbose).id
+AzureADPreview\Set-AzureADMSGroup -id $AllFullyManagedAndroidDevices -GroupTypes "DynamicMembership" -MembershipRule '(device.enrollmentProfileName -eq "Dedicated Devices Android Enterprise")' -MembershipRuleProcessingState "On" -Verbose
