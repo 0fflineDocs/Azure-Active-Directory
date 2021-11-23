@@ -1,5 +1,5 @@
-$Autpilot = "All Autopilot Devices"
-$AllAutoPilotDevices = (AzureADPreview\New-AzureADMSGroup -Description $Autpilot -DisplayName $Autpilot -mailEnabled 0 -mailnickname 0 -securityEnabled 1 -Verbose).id
+$Autopilot = "All Autopilot Devices"
+$AllAutoPilotDevices = (AzureADPreview\New-AzureADMSGroup -Description $Autopilot -DisplayName $Autopilot -mailEnabled 0 -mailnickname 0 -securityEnabled 1 -Verbose).id
 AzureADPreview\Set-AzureADMSGroup -id $AllAutoPilotDevices -GroupTypes "DynamicMembership" -MembershipRule '(device.devicePhysicalIDs -any _ -contains "[ZTDId]")' -MembershipRuleProcessingState "On" -Verbose
 
 $Windows = "All Windows Devices"
