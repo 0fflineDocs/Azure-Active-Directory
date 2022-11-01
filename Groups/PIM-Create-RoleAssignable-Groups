@@ -1,0 +1,56 @@
+<# 
+Pre-Requisites 
+Active Azure AD Role: Privileged Role Administrator
+Module: AzureADPreview
+#>
+
+(Get-Module -ListAvailable -Name AzureADPreview -ErrorAction SilentlyContinue) | Select-Object Name, Version 
+Install-Module -Name AzureADPreview -AllowClobber -Force -Scope AllUsers
+Import-Module AzureADPreview -Verbose
+
+AzureADPreview\Connect-AzureAD
+
+$Grouplist = "Azure-PIM-Group-1", "Azure-PIM-Group-2"
+$Ownerlist = "123456-1111-1111-1111-e4235cec7cbb", "321670-1111-1111-1111-e4235cec7bbb" 
+
+$Groupcount = 0
+Foreach ($Group in $Grouplist) {
+$Groupcount ++
+Write-Host "Group $($Groupcount) of $($Grouplist.count) $($Group)"
+try {
+$GroupProperty = (Get-AzureADMSGroup | Where-Object Displayname -eq $($Group))
+if ($null -eq $GroupProperty) {
+$PIMGroup = (New-AzureADMSGroup -Description $($Group) -DisplayName $($Group) -IsAssignableToRole 1 -mailEnabled 0 -mailnickname 0 -securityEnabled 1).id
+Write-Host "Group Created: $($Group)" -ForegroundColor Green
+}
+else {
+Write-Host "Could not create $($Group), already exists." -ForegroundColor Yellow
+}
+}
+catch [System.Exception] {
+    Write-Error "Could not create $($Group)" -ErrorAction Continue
+}
+$OwnerCount = 0
+Foreach ($Owner in $Ownerlist) {
+$OwnerCount ++
+Write-Host "Owner $($Ownercount) of $($Ownerlist.count) $($Owner)"
+$Owner = (Get-AzureADUser -ObjectId $($Owner))
+try {
+$GroupProperty = (Get-AzureADMSGroup | Where-Object Displayname -eq $($Group))
+$GroupOwner = (Get-AzureADGroupOwner -ObjectId $PIMGroup)
+
+if ($Null -eq $GroupOwner) {
+AzureADPreview\Add-AzureADGroupOwner -ObjectId $PIMGroup -RefObjectId $($Owner.objectid)
+
+Write-Host "Added Azure AD Group Owner: $($Owner.UserPrincipalname) to $($Group)" -ForegroundColor Green
+}
+else 
+{
+Write-Host "Could not add $($Owner.UserPrincipalname) to $($Group) the user is already an owner of the group." -ForegroundColor Yellow
+}
+}
+catch [System.Exception] {
+    Write-Error "Could not add $($Owner.UserPrincipalname) to $($Group)" -ErrorAction Continue
+}
+}
+}
